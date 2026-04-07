@@ -1,0 +1,59 @@
+name: Feature request
+description: Suggest an improvement or new feature for Konform
+title: "[feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement to Konform.
+
+        Please describe the problem first, then the proposed solution.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the pain point or limitation.
+      placeholder: I want to ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to see?
+      description: Describe the API, behavior, or feature you are proposing.
+      placeholder: Add support for ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example usage
+      description: Show how you imagine the feature being used.
+      render: go
+      placeholder: |
+        var cfg Config
+        err := konform.Load(&cfg, ...)
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Have you considered any workaround or alternative design?
+      placeholder: I also considered ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Tradeoffs
+      description: Are there drawbacks, complexity, or compatibility concerns?
+      placeholder: This may add complexity because ...
+    validations:
+      required: false

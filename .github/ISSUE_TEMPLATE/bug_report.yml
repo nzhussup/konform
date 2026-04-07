@@ -1,0 +1,95 @@
+name: Bug report
+description: Report a bug or unexpected behavior in Konform
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        Please search existing issues before opening a new one.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly and briefly.
+      placeholder: A short description of the problem
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How can we reproduce it?
+      description: Provide steps, code, config, or a minimal example.
+      placeholder: |
+        1. Define config struct ...
+        2. Load from env/YAML ...
+        3. Observe error / wrong value ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+      placeholder: Describe the expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happened?
+      placeholder: Describe the actual behavior, output, or error
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Konform version
+      placeholder: e.g. v0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: go_version
+    attributes:
+      label: Go version
+      placeholder: e.g. go1.24.1
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: e.g. macOS 15, Ubuntu 24.04, Windows 11
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source
+    attributes:
+      label: Source involved
+      options:
+        - env
+        - yaml
+        - json
+        - defaults
+        - validation
+        - schema
+        - decode
+        - other / not sure
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Add any extra details, logs, or screenshots here.
+      placeholder: Anything else that may help
