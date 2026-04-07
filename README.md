@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/konform-logo.png" width="180" alt="konform logo">
+  <img src="docs/assets/konform-logo.png" width="260" alt="konform logo">
 </p>
 
 <p align="center">
