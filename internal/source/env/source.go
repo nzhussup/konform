@@ -26,7 +26,8 @@ func Load(sc *schema.Schema) error {
 		}
 
 		if err := decode.SetFieldValue(field, raw); err != nil {
-			return fmt.Errorf("%w: env %q -> %s: %w", errs.Decode, envName, field.Path, err)
+			ctx := fmt.Sprintf("env %q -> %s", envName, field.Path)
+			return errs.WrapDecode(errs.Decode, ctx, err)
 		}
 	}
 

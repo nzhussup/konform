@@ -9,12 +9,23 @@ import (
 	"github.com/nzhussup/conform"
 )
 
-// This example demonstrates JSON loading with strict typed decoding:
-// - nested keys and aliases (cache)
+// This example demonstrates JSON loading with strict typed decoding.
+//
+// Capabilities shown:
+// - nested object mapping using dot paths (for flat structs)
+// - alias mapping via `conf` tags (Cache uses `cache`)
 // - defaults and required fields
-// - scalar coercion (string->int/bool/float/duration)
-// - list decoding ([]string, []int, []time.Duration)
-// - custom decoding through encoding.TextUnmarshaler (LogFormat)
+// - safe coercions: string -> int/bool/float/duration
+// - list decoding: []string, []int, []time.Duration
+// - custom type decoding via encoding.TextUnmarshaler (LogFormat)
+//
+// Run:
+//
+//	go run .
+//
+// Try failure scenarios by editing config.json, for example:
+// - set App.Debug to true while changing AppDebug field type to string
+// - set Database.Port to "abc"
 type LogFormat string
 
 func (f *LogFormat) UnmarshalText(text []byte) error {
@@ -29,6 +40,7 @@ func (f *LogFormat) UnmarshalText(text []byte) error {
 }
 
 type ConfigFlat struct {
+	// Flat mapping into nested JSON paths.
 	AppName             string          `conf:"App.Name" required:"true"`
 	AppDebug            bool            `conf:"App.Debug"`
 	StartupTimeout      time.Duration   `conf:"App.StartupTimeout" default:"10s"`

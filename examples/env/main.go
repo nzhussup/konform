@@ -14,11 +14,17 @@ import (
 // - defaults
 // - required fields
 // - custom type decoding via encoding.TextUnmarshaler
+// - strict behavior (only safe conversions toward target types)
 //
 // Usage:
 //
 //	set -a; source .env.local; set +a
 //	go run .
+//
+// Notes:
+// - ENV values are always strings, so decoding is string -> typed field.
+// - Examples here: "9090" -> int, "true" -> bool, "1500ms" -> duration.
+// - Missing required values produce a validation error with field names.
 type LogFormat string
 
 func (f *LogFormat) UnmarshalText(text []byte) error {
@@ -33,14 +39,21 @@ func (f *LogFormat) UnmarshalText(text []byte) error {
 }
 
 type Config struct {
-	AppName        string        `env:"APP_NAME" default:"conform-service"`
-	Port           int           `env:"PORT" default:"8080"`
-	Debug          bool          `env:"DEBUG" default:"false"`
-	SamplingRatio  float64       `env:"SAMPLING_RATIO" default:"0.1"`
+	// defaulted string
+	AppName string `env:"APP_NAME" default:"conform-service"`
+	// string -> int
+	Port int `env:"PORT" default:"8080"`
+	// string -> bool
+	Debug bool `env:"DEBUG" default:"false"`
+	// string -> float64
+	SamplingRatio float64 `env:"SAMPLING_RATIO" default:"0.1"`
+	// string -> time.Duration
 	RequestTimeout time.Duration `env:"REQUEST_TIMEOUT" default:"2s"`
 	LogLevel       string        `env:"LOG_LEVEL" default:"info"`
-	LogFormat      LogFormat     `env:"LOG_FORMAT" default:"json"`
-	DatabaseURL    string        `env:"DATABASE_URL" required:"true"`
+	// string -> custom TextUnmarshaler
+	LogFormat LogFormat `env:"LOG_FORMAT" default:"json"`
+	// required field
+	DatabaseURL string `env:"DATABASE_URL" required:"true"`
 }
 
 func main() {

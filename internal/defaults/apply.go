@@ -23,7 +23,8 @@ func Apply(sc *schema.Schema) error {
 		}
 
 		if err := decode.SetFieldValue(f, f.DefaultValue); err != nil {
-			return fmt.Errorf("%w: invalid default for %s: %w", errs.Decode, f.Path, err)
+			ctx := fmt.Sprintf("invalid default for %s", f.Path)
+			return errs.WrapDecode(errs.Decode, ctx, err)
 		}
 	}
 

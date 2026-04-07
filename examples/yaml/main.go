@@ -15,6 +15,14 @@ import (
 // - scalar coercion (string->int/bool/float/duration)
 // - list decoding ([]string, []int, []time.Duration)
 // - custom decoding through encoding.TextUnmarshaler (LogFormat)
+//
+// Run:
+//
+//	go run .
+//
+// Try failure scenarios by editing config.yaml:
+// - set App.Debug to true while changing AppDebug type to string
+// - set Database.Port to "abc"
 type LogFormat string
 
 func (f *LogFormat) UnmarshalText(text []byte) error {
@@ -29,6 +37,7 @@ func (f *LogFormat) UnmarshalText(text []byte) error {
 }
 
 type ConfigFlat struct {
+	// Flat mapping into nested YAML paths.
 	AppName             string          `conf:"App.Name" required:"true"`
 	AppDebug            bool            `conf:"App.Debug"`
 	StartupTimeout      time.Duration   `conf:"App.StartupTimeout" default:"10s"`

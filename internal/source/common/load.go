@@ -25,12 +25,12 @@ func LoadFile(sc *schema.Schema, path string, callerDir string, format string, u
 
 	data, err := os.ReadFile(resolvedPath)
 	if err != nil {
-		return fmt.Errorf("%w: %s file %q: %w", errs.DecodeSourceRead, format, path, err)
+		return errs.WrapDecode(errs.DecodeSourceRead, fmt.Sprintf("%s file %q", format, path), err)
 	}
 
 	doc, err := unmarshal(data)
 	if err != nil {
-		return fmt.Errorf("%w: %s file: %w", errs.DecodeSourceParse, format, err)
+		return errs.WrapDecode(errs.DecodeSourceParse, fmt.Sprintf("%s file", format), err)
 	}
 
 	return Apply(sc, doc, format)
@@ -62,7 +62,8 @@ func Apply(sc *schema.Schema, doc Document, format string) error {
 		}
 
 		if err := setFieldFromValue(field, value); err != nil {
-			return fmt.Errorf("%w: %s %q -> %s: %w", errs.DecodeSourceField, format, lookupPath, field.Path, err)
+			ctx := fmt.Sprintf("%s %q -> %s", format, lookupPath, field.Path)
+			return errs.WrapDecode(errs.DecodeSourceField, ctx, err)
 		}
 	}
 

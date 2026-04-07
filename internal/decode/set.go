@@ -107,14 +107,14 @@ func setWithTextUnmarshaler(v reflect.Value, raw any) error {
 	if v.CanAddr() && v.Addr().Type().Implements(textUnmarshalerType) {
 		u := v.Addr().Interface().(encoding.TextUnmarshaler)
 		if err := u.UnmarshalText([]byte(s)); err != nil {
-			return fmt.Errorf("%w: %v", errs.Decode, err)
+			return errs.WrapDecode(errs.Decode, "", err)
 		}
 		return nil
 	}
 
 	u := v.Interface().(encoding.TextUnmarshaler)
 	if err := u.UnmarshalText([]byte(s)); err != nil {
-		return fmt.Errorf("%w: %v", errs.Decode, err)
+		return errs.WrapDecode(errs.Decode, "", err)
 	}
 	return nil
 }
@@ -267,7 +267,7 @@ func toSlice(targetType reflect.Type, raw any) (reflect.Value, error) {
 	out := reflect.MakeSlice(targetType, rv.Len(), rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		if err := setValue(out.Index(i), rv.Index(i).Interface()); err != nil {
-			return reflect.Value{}, fmt.Errorf("%w: index %d: %w", errs.Decode, i, err)
+			return reflect.Value{}, errs.WrapDecode(errs.Decode, fmt.Sprintf("index %d", i), err)
 		}
 	}
 

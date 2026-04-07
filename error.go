@@ -23,7 +23,7 @@ func (e FieldError) Error() string {
 	if e.Path == "" {
 		return e.Err.Error()
 	}
-	return fmt.Sprintf("%s: %v", e.Path, e.Err)
+	return fmt.Sprintf("%s: %s", e.Path, errs.StripValidationPrefix(e.Err))
 }
 
 type ValidationError struct {

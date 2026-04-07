@@ -3,6 +3,7 @@ package errs
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 var (
@@ -28,3 +29,59 @@ var (
 	DecodeSourceParse     = fmt.Errorf("%w: failed to parse source file", Decode)
 	DecodeSourceField     = fmt.Errorf("%w: failed to decode source field", Decode)
 )
+
+type decodeContextError struct {
+	kind    error
+	context string
+	cause   error
+}
+
+func (e *decodeContextError) Error() string {
+	base := Decode.Error()
+	if e.context != "" {
+		base += ": " + e.context
+	}
+	if e.cause != nil {
+		base += ": " + StripDecodePrefix(e.cause)
+	}
+	return base
+}
+
+func (e *decodeContextError) Unwrap() error {
+	return e.cause
+}
+
+func (e *decodeContextError) Is(target error) bool {
+	if target == Decode {
+		return true
+	}
+	return e.kind != nil && target == e.kind
+}
+
+func WrapDecode(kind error, context string, cause error) error {
+	return &decodeContextError{
+		kind:    kind,
+		context: context,
+		cause:   cause,
+	}
+}
+
+func StripDecodePrefix(err error) string {
+	return StripDomainPrefix(err, Decode)
+}
+
+func StripValidationPrefix(err error) string {
+	return StripDomainPrefix(err, Validation)
+}
+
+func StripDomainPrefix(err error, domain error) string {
+	if err == nil {
+		return ""
+	}
+	msg := err.Error()
+	prefix := domain.Error() + ": "
+	for strings.HasPrefix(msg, prefix) {
+		msg = strings.TrimPrefix(msg, prefix)
+	}
+	return msg
+}
