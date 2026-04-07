@@ -15,10 +15,10 @@ func TestBuild(t *testing.T) {
 	}
 
 	type config struct {
-		Name       string `conf:"name" env:"NAME" default:"app" required:"true"`
+		Name       string `key:"name" env:"NAME" default:"app" required:"true"`
 		Count      int
-		Nested     nested `conf:"nested"`
-		unexported string `conf:"skip"`
+		Nested     nested `key:"nested"`
+		unexported string `key:"skip"`
 	}
 
 	type args struct {
@@ -72,8 +72,8 @@ func TestBuild(t *testing.T) {
 				if f0.Path != "Name" {
 					t.Fatalf("field[0].Path = %q, want %q", f0.Path, "Name")
 				}
-				if f0.ConfName != "name" || f0.EnvName != "NAME" {
-					t.Fatalf("field[0] tags not parsed correctly: conf=%q env=%q", f0.ConfName, f0.EnvName)
+				if f0.KeyName != "name" || f0.EnvName != "NAME" {
+					t.Fatalf("field[0] tags not parsed correctly: key=%q env=%q", f0.KeyName, f0.EnvName)
 				}
 				if !f0.HasDefaultValue || f0.DefaultValue != "app" {
 					t.Fatalf("field[0] default parsing incorrect: has=%v value=%q", f0.HasDefaultValue, f0.DefaultValue)

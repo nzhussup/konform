@@ -14,20 +14,20 @@ import (
 )
 
 func TestLoadFile(t *testing.T) {
-	makeStringField := func(path string, conf string, target *string) schema.Field {
+	makeStringField := func(path string, key string, target *string) schema.Field {
 		return schema.Field{
-			Path:     path,
-			ConfName: conf,
-			Type:     reflect.TypeOf(""),
-			Value:    reflect.ValueOf(target).Elem(),
+			Path:    path,
+			KeyName: key,
+			Type:    reflect.TypeOf(""),
+			Value:   reflect.ValueOf(target).Elem(),
 		}
 	}
-	makeIntField := func(path string, conf string, target *int) schema.Field {
+	makeIntField := func(path string, key string, target *int) schema.Field {
 		return schema.Field{
-			Path:     path,
-			ConfName: conf,
-			Type:     reflect.TypeOf(0),
-			Value:    reflect.ValueOf(target).Elem(),
+			Path:    path,
+			KeyName: key,
+			Type:    reflect.TypeOf(0),
+			Value:   reflect.ValueOf(target).Elem(),
 		}
 	}
 
@@ -218,10 +218,10 @@ func TestApply(t *testing.T) {
 				return &schema.Schema{
 					Fields: []schema.Field{
 						{
-							Path:     "Port",
-							ConfName: "port",
-							Type:     reflect.TypeOf(0),
-							Value:    reflect.ValueOf(&port).Elem(),
+							Path:    "Port",
+							KeyName: "port",
+							Type:    reflect.TypeOf(0),
+							Value:   reflect.ValueOf(&port).Elem(),
 						},
 					},
 				}
@@ -241,10 +241,10 @@ func TestApply(t *testing.T) {
 				return &schema.Schema{
 					Fields: []schema.Field{
 						{
-							Path:     "Enabled",
-							ConfName: "enabled",
-							Type:     reflect.TypeOf(""),
-							Value:    reflect.ValueOf(&enabled).Elem(),
+							Path:    "Enabled",
+							KeyName: "enabled",
+							Type:    reflect.TypeOf(""),
+							Value:   reflect.ValueOf(&enabled).Elem(),
 						},
 					},
 				}
@@ -261,10 +261,10 @@ func TestApply(t *testing.T) {
 				return &schema.Schema{
 					Fields: []schema.Field{
 						{
-							Path:     "Server",
-							ConfName: "server_cfg",
-							Type:     reflect.TypeOf(parent),
-							Value:    reflect.ValueOf(&parent).Elem(),
+							Path:    "Server",
+							KeyName: "server_cfg",
+							Type:    reflect.TypeOf(parent),
+							Value:   reflect.ValueOf(&parent).Elem(),
 						},
 						{
 							Path:  "Server.Port",
@@ -325,12 +325,12 @@ func TestBuildPathAliases(t *testing.T) {
 		want map[string]string
 	}{
 		{
-			name: "collects only fields with conf names",
+			name: "collects only fields with key names",
 			sc: &schema.Schema{
 				Fields: []schema.Field{
-					{Path: "Server", ConfName: "server_cfg"},
-					{Path: "Server.Port", ConfName: ""},
-					{Path: "DB.Host", ConfName: "db_host"},
+					{Path: "Server", KeyName: "server_cfg"},
+					{Path: "Server.Port", KeyName: ""},
+					{Path: "DB.Host", KeyName: "db_host"},
 				},
 			},
 			want: map[string]string{
@@ -363,10 +363,10 @@ func TestResolveLookupPath(t *testing.T) {
 		want        string
 	}{
 		{
-			name: "uses field conf name directly",
+			name: "uses field key name directly",
 			field: schema.Field{
-				Path:     "Server.Port",
-				ConfName: "server_port",
+				Path:    "Server.Port",
+				KeyName: "server_port",
 			},
 			pathAliases: map[string]string{
 				"Server": "server_cfg",

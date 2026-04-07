@@ -13,7 +13,7 @@ import (
 //
 // Capabilities shown:
 // - nested object mapping using dot paths (for flat structs)
-// - alias mapping via `conf` tags (Cache uses `cache`)
+// - alias mapping via `key` tags (Cache uses `cache`)
 // - defaults and required fields
 // - safe coercions: string -> int/bool/float/duration
 // - list decoding: []string, []int, []time.Duration
@@ -41,24 +41,24 @@ func (f *LogFormat) UnmarshalText(text []byte) error {
 
 type ConfigFlat struct {
 	// Flat mapping into nested JSON paths.
-	AppName             string          `conf:"App.Name" required:"true"`
-	AppDebug            bool            `conf:"App.Debug"`
-	StartupTimeout      time.Duration   `conf:"App.StartupTimeout" default:"10s"`
-	AppAllowedOrigins   []string        `conf:"App.AllowedOrigins"`
-	AppAdminPorts       []int           `conf:"App.AdminPorts"`
-	DatabasePort        int             `conf:"Database.Port" required:"true"`
-	DatabaseURI         string          `conf:"Database.URI" required:"true"`
-	DatabasePoolSize    int             `conf:"Database.PoolSize" default:"20"`
-	DatabaseMaxLifetime time.Duration   `conf:"Database.MaxLifetime" default:"30m"`
-	CacheEnabled        bool            `conf:"cache.Enabled" default:"true"`
-	CachePort           int             `conf:"cache.Port" required:"true"`
-	CacheURI            string          `conf:"cache.URI" required:"true"`
-	SamplingRatio       float64         `conf:"Observability.SamplingRatio" default:"0.1"`
-	RetryBackoff        time.Duration   `conf:"Observability.RetryBackoff" default:"250ms"`
-	AlertWindows        []time.Duration `conf:"Observability.AlertWindows"`
-	LogLevel            string          `conf:"Log.Level" default:"info"`
-	LogFormat           LogFormat       `conf:"Log.Format" default:"json"`
-	LogOutputs          []LogFormat     `conf:"Log.Outputs"`
+	AppName             string          `key:"App.Name" required:"true"`
+	AppDebug            bool            `key:"App.Debug"`
+	StartupTimeout      time.Duration   `key:"App.StartupTimeout" default:"10s"`
+	AppAllowedOrigins   []string        `key:"App.AllowedOrigins"`
+	AppAdminPorts       []int           `key:"App.AdminPorts"`
+	DatabasePort        int             `key:"Database.Port" required:"true"`
+	DatabaseURI         string          `key:"Database.URI" required:"true"`
+	DatabasePoolSize    int             `key:"Database.PoolSize" default:"20"`
+	DatabaseMaxLifetime time.Duration   `key:"Database.MaxLifetime" default:"30m"`
+	CacheEnabled        bool            `key:"cache.Enabled" default:"true"`
+	CachePort           int             `key:"cache.Port" required:"true"`
+	CacheURI            string          `key:"cache.URI" required:"true"`
+	SamplingRatio       float64         `key:"Observability.SamplingRatio" default:"0.1"`
+	RetryBackoff        time.Duration   `key:"Observability.RetryBackoff" default:"250ms"`
+	AlertWindows        []time.Duration `key:"Observability.AlertWindows"`
+	LogLevel            string          `key:"Log.Level" default:"info"`
+	LogFormat           LogFormat       `key:"Log.Format" default:"json"`
+	LogOutputs          []LogFormat     `key:"Log.Outputs"`
 }
 
 type ConfigInlineNested struct {
@@ -79,7 +79,7 @@ type ConfigInlineNested struct {
 		Enabled bool
 		Port    int
 		URI     string
-	} `conf:"cache" required:"true"`
+	} `key:"cache" required:"true"`
 	Observability struct {
 		SamplingRatio float64
 		RetryBackoff  time.Duration
@@ -95,9 +95,9 @@ type ConfigInlineNested struct {
 type ConfigNested struct {
 	App      App
 	Database Database
-	Cache    Cache `conf:"cache" required:"true"`
+	Cache    Cache `key:"cache" required:"true"`
 	Log      Log
-	Obs      Observability `conf:"Observability"`
+	Obs      Observability `key:"Observability"`
 }
 
 type App struct {

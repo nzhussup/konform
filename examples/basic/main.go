@@ -13,13 +13,13 @@ type Config struct {
 	Server struct {
 		Port int    `default:"8080"`
 		Host string `default:"0.0.0.0"`
-	} `conf:"server"`
+	} `key:"server"`
 
 	Database struct {
-		URL string `conf:"url" env:"DATABASE_URL" required:"true"`
-	} `conf:"database"`
+		URL string `key:"url" env:"DATABASE_URL" required:"true"`
+	} `key:"database"`
 
-	LogLevel string `conf:"log_level" default:"info"`
+	LogLevel string `key:"log_level" default:"info"`
 }
 
 func main() {

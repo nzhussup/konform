@@ -81,17 +81,17 @@ func setFieldFromValue(field schema.Field, value interface{}) error {
 func BuildPathAliases(sc *schema.Schema) map[string]string {
 	aliases := make(map[string]string, len(sc.Fields))
 	for _, field := range sc.Fields {
-		if field.ConfName == "" {
+		if field.KeyName == "" {
 			continue
 		}
-		aliases[field.Path] = field.ConfName
+		aliases[field.Path] = field.KeyName
 	}
 	return aliases
 }
 
 func ResolveLookupPath(field schema.Field, pathAliases map[string]string) string {
-	if field.ConfName != "" {
-		return field.ConfName
+	if field.KeyName != "" {
+		return field.KeyName
 	}
 
 	resolved := field.Path

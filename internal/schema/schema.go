@@ -10,7 +10,7 @@ import (
 type Field struct {
 	GoName          string
 	Path            string
-	ConfName        string
+	KeyName         string
 	EnvName         string
 	DefaultValue    string
 	HasDefaultValue bool
@@ -65,7 +65,7 @@ func collectFields(v reflect.Value, t reflect.Type, parentPath string, fields *[
 		*fields = append(*fields, Field{
 			GoName:          structField.Name,
 			Path:            path,
-			ConfName:        structField.Tag.Get("conf"),
+			KeyName:         structField.Tag.Get("key"),
 			EnvName:         structField.Tag.Get("env"),
 			DefaultValue:    defaultValue,
 			HasDefaultValue: hasDefaultValue,
