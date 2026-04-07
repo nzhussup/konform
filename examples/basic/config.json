@@ -1,0 +1,9 @@
+{
+    "App": {
+        "Name": "Conform",
+        "Version": "0.1.0",
+        "Description": "A configuration management library for Go applications.",
+        "Author": "Nurzhanat Zhussup",
+        "License": "MIT"
+    }
+}

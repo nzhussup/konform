@@ -10,22 +10,30 @@ import (
 // This example demonstrates source precedence:
 // YAML is loaded first, then ENV overrides matching fields.
 type Config struct {
-	Server struct {
-		Port int    `default:"8080"`
-		Host string `default:"0.0.0.0"`
-	} `key:"server"`
-
+	App struct {
+		Name        string
+		Version     string
+		Description string
+		Author      string
+		License     string
+	}
 	Database struct {
-		URL string `key:"url" env:"DATABASE_URL" required:"true"`
-	} `key:"database"`
-
-	LogLevel string `key:"log_level" default:"info"`
+		Port        int
+		URI         string
+		PoolSize    int
+		MaxLifetime string
+	}
+	Redis struct {
+		Host string `env:"REDIS_HOST"`
+		Port int    `env:"REDIS_PORT"`
+	}
 }
 
 func main() {
 	var cfg Config
 
 	err := conform.Load(&cfg,
+		conform.FromJSONFile("config.json"),
 		conform.FromYAMLFile("config.yaml"),
 		conform.FromEnv(),
 	)

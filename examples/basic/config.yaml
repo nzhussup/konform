@@ -1,0 +1,5 @@
+Database:
+  Port: "5432"
+  URI: postgres://user:password@localhost/mydb
+  PoolSize: 48
+  MaxLifetime: 45m
