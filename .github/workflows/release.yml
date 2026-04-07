@@ -21,6 +21,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.RELEASE_PUSH_TOKEN }}
+          persist-credentials: false
 
       - name: Fetch tags
         run: git fetch --force --tags
@@ -36,8 +38,8 @@ jobs:
 
       - name: Commit changelog back to main
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
 
           git checkout main
           git add CHANGELOG.md
@@ -46,7 +48,7 @@ jobs:
             echo "No changelog changes"
           else
             git commit -m "docs: update changelog for ${{ github.ref_name }} [skip ci]"
-            git push origin HEAD:main
+            git push "https://x-access-token:${{ secrets.RELEASE_PUSH_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:main
           fi
 
       - name: Build release notes from CHANGELOG section
