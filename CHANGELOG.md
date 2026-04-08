@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.0 - 2026-04-08
+
+
+
+### Documentation
+
+- Add code of conduct
+
+- Update changelog for v0.1.3 [skip ci]
+
+
+### Features
+
+- Imrpove error logging and avoid fail fast on type cast errors
+
+
+### Refactoring
+
+- Restructure validate dir to allow clean addition of additional validators
+
+- Rename validations to validators
+
+- Refactor required tag to be validate, so that validate can include multiple validations
+
+
 ## v0.1.3 - 2026-04-07
 
 
