@@ -1,0 +1,12 @@
+{
+    "AppName": "Validation Example",
+    "Version": "1.0.0",
+    "Description": "An example configuration for validation",
+    "Database": {
+        "Host": "localhost",
+        "Port": 5432,
+        "Username": "user",
+        "Password": "password",
+        "Name": "example_db"
+    }
+}

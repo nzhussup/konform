@@ -18,7 +18,14 @@ var (
 	InvalidSchemaEmptyJSON  = fmt.Errorf("%w: json path must not be empty", InvalidSchema)
 	InvalidSchemaEmptyTOML  = fmt.Errorf("%w: toml path must not be empty", InvalidSchema)
 
-	ValidationRequired = fmt.Errorf("%w: required", Validation)
+	ValidationRequired   = fmt.Errorf("%w: required", Validation)
+	ValidationMin        = fmt.Errorf("%w: minimum value not met", Validation)
+	ValidationMax        = fmt.Errorf("%w: maximum value exceeded", Validation)
+	ValidationNonNumeric = fmt.Errorf("%w: non-numeric value", Validation)
+	ValidationLen        = fmt.Errorf("%w: length mismatch", Validation)
+	ValidationMinLen     = fmt.Errorf("%w: minimum length not met", Validation)
+	ValidationMaxLen     = fmt.Errorf("%w: maximum length exceeded", Validation)
+	ValidationPattern    = fmt.Errorf("%w: pattern mismatch", Validation)
 
 	DecodeFieldCannotSet  = fmt.Errorf("%w: field cannot be set", Decode)
 	DecodeInvalidInt      = fmt.Errorf("%w: invalid int value", Decode)

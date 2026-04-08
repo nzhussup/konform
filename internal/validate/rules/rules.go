@@ -5,10 +5,13 @@ import (
 	"github.com/nzhussup/konform/internal/validate/validators"
 )
 
-const Required = "required"
-
 var Registry = map[string]types.ValidationFunc{
-	Required: validators.Required,
+	validators.RequiredRuleName: validators.Required,
+	validators.MinRuleName:      validators.Min,
+	validators.MaxRuleName:      validators.Max,
+	validators.LenRuleName:      validators.Len,
+	validators.MinLenRuleName:   validators.MinLen,
+	validators.MaxLenRuleName:   validators.MaxLen,
 }
 
 func IsSupported(name string) bool {

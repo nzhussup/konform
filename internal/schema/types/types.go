@@ -1,6 +1,9 @@
 package types
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 type Field struct {
 	GoName       string
@@ -31,6 +34,10 @@ func (f Field) ValidationArg(name string) (string, bool) {
 	}
 	v, ok := f.Validations[name]
 	return v, ok
+}
+
+func (f Field) ValueAsString() string {
+	return fmt.Sprintf("%v", f.Value.Interface())
 }
 
 type Schema struct {

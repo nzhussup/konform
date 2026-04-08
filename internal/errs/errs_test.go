@@ -86,6 +86,18 @@ func TestStripDomainPrefix(t *testing.T) {
 			domain: Validation,
 			want:   "required",
 		},
+		{
+			name:   "validation min prefix stripped",
+			err:    ValidationMin,
+			domain: Validation,
+			want:   "minimum value not met",
+		},
+		{
+			name:   "validation non numeric prefix stripped",
+			err:    ValidationNonNumeric,
+			domain: Validation,
+			want:   "non-numeric value",
+		},
 	}
 
 	for _, tt := range tests {

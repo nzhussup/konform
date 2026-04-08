@@ -113,7 +113,7 @@ func TestBuildCollectsExportedAndNestedFields(t *testing.T) {
 
 func TestBuildReturnsInvalidSchemaForUnsupportedValidateRule(t *testing.T) {
 	type config struct {
-		Age int `validate:"min=10"`
+		Age int `validate:"unknown=10"`
 	}
 
 	_, err := Build(&config{})
@@ -123,8 +123,8 @@ func TestBuildReturnsInvalidSchemaForUnsupportedValidateRule(t *testing.T) {
 	if !errors.Is(err, errs.InvalidSchema) {
 		t.Fatalf("Build() error = %v, want wrapped %v", err, errs.InvalidSchema)
 	}
-	if !strings.Contains(err.Error(), "unsupported validate rule \"min\"") {
-		t.Fatalf("Build() error = %q, want unsupported min rule message", err.Error())
+	if !strings.Contains(err.Error(), "unsupported validate rule \"unknown\"") {
+		t.Fatalf("Build() error = %q, want unsupported unknown rule message", err.Error())
 	}
 }
 

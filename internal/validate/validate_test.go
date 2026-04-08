@@ -96,12 +96,24 @@ func TestValidate(t *testing.T) {
 			schemaBuilder: func() *schema.Schema {
 				return &schema.Schema{
 					Fields: []schema.Field{
-						makeIntField("Age", map[string]string{"min": "18"}, new(int)),
+						makeIntField("Age", map[string]string{"unknown": "18"}, new(int)),
 					},
 				}
 			},
 			wantErrType: errs.InvalidSchema,
 			wantCount:   0,
+		},
+		{
+			name: "min rule failure returns validation min error",
+			schemaBuilder: func() *schema.Schema {
+				return &schema.Schema{
+					Fields: []schema.Field{
+						makeIntField("Age", map[string]string{"min": "18"}, new(int)),
+					},
+				}
+			},
+			wantCount:     1,
+			wantFieldPath: []string{"Age"},
 		},
 	}
 
@@ -132,6 +144,12 @@ func TestValidate(t *testing.T) {
 			for i, wantPath := range tt.wantFieldPath {
 				if results[i].Field.Path != wantPath {
 					t.Fatalf("results[%d].Field.Path = %q, want %q", i, results[i].Field.Path, wantPath)
+				}
+				if tt.name == "min rule failure returns validation min error" {
+					if !errors.Is(results[i].Err, errs.ValidationMin) {
+						t.Fatalf("results[%d].Err = %v, want wrapped %v", i, results[i].Err, errs.ValidationMin)
+					}
+					continue
 				}
 				if !errors.Is(results[i].Err, errs.ValidationRequired) {
 					t.Fatalf("results[%d].Err = %v, want wrapped %v", i, results[i].Err, errs.ValidationRequired)
