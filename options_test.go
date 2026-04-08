@@ -83,6 +83,35 @@ func TestFromEnv(t *testing.T) {
 	}
 }
 
+func TestUnknownKeySuggestionOptions(t *testing.T) {
+	t.Run("nil load options", func(t *testing.T) {
+		err := WithUnknownKeySuggestionMode(UnknownKeySuggestionOff)(nil)
+		if !errors.Is(err, errs.InvalidSchemaNilOptions) {
+			t.Fatalf("WithUnknownKeySuggestionMode(nil) error = %v, want %v", err, errs.InvalidSchemaNilOptions)
+		}
+	})
+
+	t.Run("sets explicit mode", func(t *testing.T) {
+		o := &loadOptions{}
+		if err := WithUnknownKeySuggestionMode(UnknownKeySuggestionOff)(o); err != nil {
+			t.Fatalf("WithUnknownKeySuggestionMode() error = %v, want nil", err)
+		}
+		if o.unknownKeySuggestMode != UnknownKeySuggestionOff {
+			t.Fatalf("unknownKeySuggestMode = %v, want %v", o.unknownKeySuggestMode, UnknownKeySuggestionOff)
+		}
+	})
+
+	t.Run("without shortcut sets off mode", func(t *testing.T) {
+		o := &loadOptions{}
+		if err := WithoutUnknownKeySuggestions()(o); err != nil {
+			t.Fatalf("WithoutUnknownKeySuggestions() error = %v, want nil", err)
+		}
+		if o.unknownKeySuggestMode != UnknownKeySuggestionOff {
+			t.Fatalf("unknownKeySuggestMode = %v, want %v", o.unknownKeySuggestMode, UnknownKeySuggestionOff)
+		}
+	})
+}
+
 func TestFileOptions(t *testing.T) {
 	tests := []struct {
 		name        string

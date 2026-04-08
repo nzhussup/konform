@@ -9,6 +9,7 @@ import (
 	envsource "github.com/nzhussup/konform/internal/source/env"
 
 	jsonsource "github.com/nzhussup/konform/internal/source/json"
+	"github.com/nzhussup/konform/internal/source/common"
 	tomlsource "github.com/nzhussup/konform/internal/source/toml"
 	yamlsource "github.com/nzhussup/konform/internal/source/yaml"
 )
@@ -18,10 +19,18 @@ type Option func(*loadOptions) error
 type sourceLoader func(*internalschema.Schema) error
 
 type loadOptions struct {
-	sources []sourceLoader
+	sources                []sourceLoader
+	unknownKeySuggestMode  common.UnknownKeySuggestionMode
 }
 
-type fileSourceFactory func(path string, callerDir string) sourceLoader
+type UnknownKeySuggestionMode = common.UnknownKeySuggestionMode
+
+const (
+	UnknownKeySuggestionError UnknownKeySuggestionMode = common.UnknownKeySuggestionError
+	UnknownKeySuggestionOff   UnknownKeySuggestionMode = common.UnknownKeySuggestionOff
+)
+
+type fileSourceFactory func(path string, callerDir string, suggestionMode common.UnknownKeySuggestionMode) sourceLoader
 
 func FromEnv() Option {
 	return func(o *loadOptions) error {
@@ -35,22 +44,22 @@ func FromEnv() Option {
 }
 
 func FromYAMLFile(path string) Option {
-	return fromFile(path, errs.InvalidSchemaEmptyYAML, func(path string, callerDir string) sourceLoader {
-		source := yamlsource.NewFileSource(path, callerDir)
+	return fromFile(path, errs.InvalidSchemaEmptyYAML, func(path string, callerDir string, suggestionMode common.UnknownKeySuggestionMode) sourceLoader {
+		source := yamlsource.NewFileSource(path, callerDir, suggestionMode)
 		return source.Load
 	})
 }
 
 func FromJSONFile(path string) Option {
-	return fromFile(path, errs.InvalidSchemaEmptyJSON, func(path string, callerDir string) sourceLoader {
-		source := jsonsource.NewFileSource(path, callerDir)
+	return fromFile(path, errs.InvalidSchemaEmptyJSON, func(path string, callerDir string, suggestionMode common.UnknownKeySuggestionMode) sourceLoader {
+		source := jsonsource.NewFileSource(path, callerDir, suggestionMode)
 		return source.Load
 	})
 }
 
 func FromTOMLFile(path string) Option {
-	return fromFile(path, errs.InvalidSchemaEmptyTOML, func(path string, callerDir string) sourceLoader {
-		source := tomlsource.NewFileSource(path, callerDir)
+	return fromFile(path, errs.InvalidSchemaEmptyTOML, func(path string, callerDir string, suggestionMode common.UnknownKeySuggestionMode) sourceLoader {
+		source := tomlsource.NewFileSource(path, callerDir, suggestionMode)
 		return source.Load
 	})
 }
@@ -63,16 +72,32 @@ func fromFile(path string, emptyPathErr error, factory fileSourceFactory) Option
 	}
 
 	callerDir := callerDirectory(3)
-	load := factory(path, callerDir)
-
 	return func(o *loadOptions) error {
 		if o == nil {
 			return errs.InvalidSchemaNilOptions
 		}
 
-		o.sources = append(o.sources, load)
+		o.sources = append(o.sources, func(sc *internalschema.Schema) error {
+			load := factory(path, callerDir, o.unknownKeySuggestMode)
+			return load(sc)
+		})
 		return nil
 	}
+}
+
+func WithUnknownKeySuggestionMode(mode UnknownKeySuggestionMode) Option {
+	return func(o *loadOptions) error {
+		if o == nil {
+			return errs.InvalidSchemaNilOptions
+		}
+
+		o.unknownKeySuggestMode = mode
+		return nil
+	}
+}
+
+func WithoutUnknownKeySuggestions() Option {
+	return WithUnknownKeySuggestionMode(UnknownKeySuggestionOff)
 }
 
 func callerDirectory(skip int) string {

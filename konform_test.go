@@ -153,3 +153,61 @@ func TestLoadReportsMultipleDecodeErrorsFromFile(t *testing.T) {
 		}
 	}
 }
+
+func TestLoadUnknownKeySuggestionMode(t *testing.T) {
+	type config struct {
+		AppName string `validate:"required"`
+	}
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.json")
+	content := `{"App":{"Name":"konform-service"}}`
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+
+	t.Run("default mode returns decode error with suggestion", func(t *testing.T) {
+		cfg := &config{}
+		err := Load(cfg, FromJSONFile(path))
+		if err == nil {
+			t.Fatalf("Load() error = nil, want decode error")
+		}
+		if !errors.Is(err, ErrDecode) {
+			t.Fatalf("Load() error = %v, want wrapped %v", err, ErrDecode)
+		}
+		wantParts := []string{`unknown key "AppName"`, `did you mean "App.Name"?`}
+		for _, part := range wantParts {
+			if !strings.Contains(err.Error(), part) {
+				t.Fatalf("Load() error = %q, want to contain %q", err.Error(), part)
+			}
+		}
+	})
+
+	t.Run("off mode ignores suggestion and falls through to validation", func(t *testing.T) {
+		cfg := &config{}
+		err := Load(cfg, FromJSONFile(path), WithoutUnknownKeySuggestions())
+		if err == nil {
+			t.Fatalf("Load() error = nil, want validation error")
+		}
+		if !errors.Is(err, ErrValidation) {
+			t.Fatalf("Load() error = %v, want wrapped %v", err, ErrValidation)
+		}
+		if strings.Contains(err.Error(), "unknown key") {
+			t.Fatalf("Load() error = %q, want no unknown-key decode error", err.Error())
+		}
+		if !strings.Contains(err.Error(), "AppName: required") {
+			t.Fatalf("Load() error = %q, want required validation for AppName", err.Error())
+		}
+	})
+
+	t.Run("off mode works even when option is set before source", func(t *testing.T) {
+		cfg := &config{}
+		err := Load(cfg, WithoutUnknownKeySuggestions(), FromJSONFile(path))
+		if err == nil {
+			t.Fatalf("Load() error = nil, want validation error")
+		}
+		if !errors.Is(err, ErrValidation) {
+			t.Fatalf("Load() error = %v, want wrapped %v", err, ErrValidation)
+		}
+	})
+}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/nzhussup/konform/internal/errs"
 	"github.com/nzhussup/konform/internal/schema"
+	"github.com/nzhussup/konform/internal/source/common"
 )
 
 func TestNewFileSource(t *testing.T) {
@@ -24,12 +25,15 @@ func TestNewFileSource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewFileSource(tt.path, tt.callerDir)
+			got := NewFileSource(tt.path, tt.callerDir, common.UnknownKeySuggestionError)
 			if got.path != tt.path {
 				t.Fatalf("path = %q, want %q", got.path, tt.path)
 			}
 			if got.callerDir != tt.callerDir {
 				t.Fatalf("callerDir = %q, want %q", got.callerDir, tt.callerDir)
+			}
+			if got.suggestionMode != common.UnknownKeySuggestionError {
+				t.Fatalf("suggestionMode = %v, want %v", got.suggestionMode, common.UnknownKeySuggestionError)
 			}
 		})
 	}
@@ -67,7 +71,7 @@ func TestLoad(t *testing.T) {
 			name: "nil schema",
 			setup: func(t *testing.T) (FileSource, *schema.Schema) {
 				t.Helper()
-				return NewFileSource("config.toml", ""), nil
+				return NewFileSource("config.toml", "", common.UnknownKeySuggestionError), nil
 			},
 			wantErrType: errs.InvalidSchemaNil,
 		},
@@ -76,7 +80,7 @@ func TestLoad(t *testing.T) {
 			setup: func(t *testing.T) (FileSource, *schema.Schema) {
 				t.Helper()
 				var port int
-				return NewFileSource("missing.toml", t.TempDir()), makeSchema(&port, nil)
+				return NewFileSource("missing.toml", t.TempDir(), common.UnknownKeySuggestionError), makeSchema(&port, nil)
 			},
 			wantErrType: errs.DecodeSourceRead,
 		},
@@ -90,7 +94,7 @@ func TestLoad(t *testing.T) {
 					t.Fatalf("WriteFile() error = %v", err)
 				}
 				var port int
-				return NewFileSource("config.toml", dir), makeSchema(&port, nil)
+				return NewFileSource("config.toml", dir, common.UnknownKeySuggestionError), makeSchema(&port, nil)
 			},
 			wantErrType: errs.DecodeSourceParse,
 		},
@@ -106,7 +110,7 @@ func TestLoad(t *testing.T) {
 				}
 				var port int
 				var mode string
-				return NewFileSource("config.toml", dir), makeSchema(&port, &mode)
+				return NewFileSource("config.toml", dir, common.UnknownKeySuggestionError), makeSchema(&port, &mode)
 			},
 			wantErrType: errs.DecodeSourceField,
 			wantErrLike: []string{`toml "mode" -> Mode`, "expected string, got bool"},
@@ -121,7 +125,7 @@ func TestLoad(t *testing.T) {
 					t.Fatalf("WriteFile() error = %v", err)
 				}
 				var port int
-				return NewFileSource("config.toml", dir), makeSchema(&port, nil)
+				return NewFileSource("config.toml", dir, common.UnknownKeySuggestionError), makeSchema(&port, nil)
 			},
 			validate: func(t *testing.T, sc *schema.Schema) {
 				t.Helper()

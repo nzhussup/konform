@@ -42,7 +42,7 @@ func (f *LogFormat) UnmarshalText(text []byte) error {
 type ConfigFlat struct {
 	// Flat mapping into nested JSON paths.
 	AppName             string          `key:"App.Name" validate:"required"`
-	AppDebug            bool            `key:"App.Debug"`
+	AppDebug            bool            `key:"App.Debug" default:"false"`
 	StartupTimeout      time.Duration   `key:"App.StartupTimeout" default:"10s"`
 	AppAllowedOrigins   []string        `key:"App.AllowedOrigins"`
 	AppAdminPorts       []int           `key:"App.AdminPorts"`

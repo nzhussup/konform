@@ -312,6 +312,107 @@ func TestApply(t *testing.T) {
 				}
 			},
 		},
+		{
+			name: "explicit key typo reports missing expected key with suggestion",
+			scBuilder: func() *schema.Schema {
+				var port int
+				return &schema.Schema{
+					Fields: []schema.Field{
+						{
+							Path:    "AppName",
+							KeyName: "App.Nam",
+							Type:    reflect.TypeOf(0),
+							Value:   reflect.ValueOf(&port).Elem(),
+						},
+					},
+				}
+			},
+			doc: Document{
+				"App": map[string]any{
+					"Name": 8080,
+				},
+			},
+			wantErrType: errs.DecodeSourceField,
+			wantErrLike: []string{`unknown key "App.Nam"`, `did you mean "App.Name"?`},
+		},
+		{
+			name: "non explicit path typo reports missing expected key with suggestion",
+			scBuilder: func() *schema.Schema {
+				type server struct{ Port int }
+				var s server
+				var port int
+				return &schema.Schema{
+					Fields: []schema.Field{
+						{
+							Path:  "Server",
+							Type:  reflect.TypeOf(s),
+							Value: reflect.ValueOf(&s).Elem(),
+						},
+						{
+							Path:  "Server.Port",
+							Type:  reflect.TypeOf(0),
+							Value: reflect.ValueOf(&port).Elem(),
+						},
+					},
+				}
+			},
+			doc: Document{
+				"Server": map[string]any{
+					"Porrt": 8080,
+				},
+			},
+			wantErrType: errs.DecodeSourceField,
+			wantErrLike: []string{`unknown key "Server.Port"`, `did you mean "Server.Porrt"?`},
+		},
+		{
+			name: "struct field path missing suggests dotted key from file",
+			scBuilder: func() *schema.Schema {
+				var appName string
+				return &schema.Schema{
+					Fields: []schema.Field{
+						{
+							Path:  "AppName",
+							Type:  reflect.TypeOf(""),
+							Value: reflect.ValueOf(&appName).Elem(),
+						},
+					},
+				}
+			},
+			doc: Document{
+				"App": map[string]any{
+					"Name": "konform",
+				},
+			},
+			wantErrType: errs.DecodeSourceField,
+			wantErrLike: []string{`unknown key "AppName"`, `did you mean "App.Name"?`},
+		},
+		{
+			name: "extra file keys are ignored when struct key is present",
+			scBuilder: func() *schema.Schema {
+				var appDebug bool
+				return &schema.Schema{
+					Fields: []schema.Field{
+						{
+							Path:  "AppDebug",
+							Type:  reflect.TypeOf(true),
+							Value: reflect.ValueOf(&appDebug).Elem(),
+						},
+					},
+				}
+			},
+			doc: Document{
+				"AppDebug": true,
+				"App": map[string]any{
+					"Debug": true,
+				},
+			},
+			validate: func(t *testing.T, sc *schema.Schema) {
+				t.Helper()
+				if got := sc.Fields[0].Value.Interface().(bool); !got {
+					t.Fatalf("AppDebug = %v, want true", got)
+				}
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -341,6 +442,85 @@ func TestApply(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestBuildExpectedLookupPaths(t *testing.T) {
+	type nested struct{}
+
+	var parent nested
+	var port int
+	var timeout int
+
+	sc := &schema.Schema{
+		Fields: []schema.Field{
+			{
+				Path:    "Server",
+				KeyName: "server_cfg",
+				Type:    reflect.TypeOf(parent),
+				Value:   reflect.ValueOf(&parent).Elem(),
+			},
+			{
+				Path:  "Server.Port",
+				Type:  reflect.TypeOf(0),
+				Value: reflect.ValueOf(&port).Elem(),
+			},
+			{
+				Path:    "Timeout",
+				KeyName: "timeout",
+				Type:    reflect.TypeOf(0),
+				Value:   reflect.ValueOf(&timeout).Elem(),
+			},
+		},
+	}
+
+	got := BuildExpectedLookupPaths(sc, BuildPathAliases(sc))
+	want := map[string]struct{}{
+		"server_cfg.Port": {},
+		"timeout":         {},
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("BuildExpectedLookupPaths() = %#v, want %#v", got, want)
+	}
+}
+
+func TestFlattenLeafPaths(t *testing.T) {
+	doc := Document{
+		"server": map[string]any{
+			"port": 8080,
+			"tls": map[string]any{
+				"enabled": true,
+			},
+		},
+		"mode": "prod",
+	}
+
+	got := FlattenLeafPaths(doc)
+	want := []string{"mode", "server.port", "server.tls.enabled"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("FlattenLeafPaths() = %#v, want %#v", got, want)
+	}
+}
+
+func TestSuggestPath(t *testing.T) {
+	expected := map[string]struct{}{
+		"server.port": {},
+		"server.host": {},
+		"log.level":   {},
+	}
+
+	got, ok := SuggestPath("server.poort", expected)
+	if !ok {
+		t.Fatalf("SuggestPath() expected suggestion, got none")
+	}
+	if got != "server.port" {
+		t.Fatalf("SuggestPath() = %q, want %q", got, "server.port")
+	}
+
+	got, ok = SuggestPath("completely.different.key", expected)
+	if ok {
+		t.Fatalf("SuggestPath() expected no suggestion, got %q", got)
 	}
 }
 
@@ -487,7 +667,7 @@ func TestGetByPath(t *testing.T) {
 		{
 			name: "nested map interface-any with string keys",
 			doc: Document{
-				"server": map[interface{}]interface{}{
+				"server": map[any]any{
 					"port": 9000,
 				},
 			},
@@ -516,7 +696,7 @@ func TestGetByPath(t *testing.T) {
 		{
 			name: "map interface-any with non-string key fails",
 			doc: Document{
-				"server": map[interface{}]interface{}{
+				"server": map[any]any{
 					1: "bad",
 				},
 			},
