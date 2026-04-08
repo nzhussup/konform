@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.0 - 2026-04-08
+
+
+
+### Documentation
+
+- Update changelog for v0.2.0 [skip ci]
+
+
+### Features
+
+- Add supported validator logic
+
+- Evolve and extend validation options
+
+- Add linter
+
+- Add unknown key suggestions and configurable mode for suggestions
+
+
+### Fixes
+
+- Fix ci to use v2 linter
+
+- Fmt
+
+
 ## v0.2.0 - 2026-04-08
 
 
