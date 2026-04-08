@@ -2,16 +2,13 @@ package validators
 
 import (
 	"github.com/nzhussup/konform/internal/errs"
-	"github.com/nzhussup/konform/internal/schema"
-	"github.com/nzhussup/konform/internal/validate/model"
+	schematypes "github.com/nzhussup/konform/internal/schema/types"
+	"github.com/nzhussup/konform/internal/validate/types"
 )
 
-func Required(f schema.Field, validations *[]model.ValidationResult) {
-	if !f.HasValidation("required") {
-		return
-	}
-	if schema.IsZeroValue(f.Value) {
-		*validations = append(*validations, model.ValidationResult{
+func Required(f schematypes.Field, validations *[]types.ValidationResult) {
+	if schematypes.IsZeroValue(f.Value) {
+		*validations = append(*validations, types.ValidationResult{
 			Field: f,
 			Err:   errs.ValidationRequired,
 		})

@@ -1,19 +1,39 @@
 package validate
 
 import (
+	"fmt"
+	"sort"
+
 	"github.com/nzhussup/konform/internal/errs"
 	"github.com/nzhussup/konform/internal/schema"
-	"github.com/nzhussup/konform/internal/validate/model"
-	"github.com/nzhussup/konform/internal/validate/validators"
+	"github.com/nzhussup/konform/internal/validate/rules"
+	"github.com/nzhussup/konform/internal/validate/types"
 )
 
-func Validate(sc *schema.Schema) ([]model.ValidationResult, error) {
+func Validate(sc *schema.Schema) ([]types.ValidationResult, error) {
 	if sc == nil {
 		return nil, errs.InvalidSchemaNil
 	}
-	var results []model.ValidationResult
+
+	var results []types.ValidationResult
 	for _, f := range sc.Fields {
-		validators.Required(f, &results)
+		if len(f.Validations) == 0 {
+			continue
+		}
+
+		ruleNames := make([]string, 0, len(f.Validations))
+		for ruleName := range f.Validations {
+			ruleNames = append(ruleNames, ruleName)
+		}
+		sort.Strings(ruleNames)
+
+		for _, ruleName := range ruleNames {
+			validator, ok := rules.Registry[ruleName]
+			if !ok {
+				return nil, fmt.Errorf("%w: unsupported validate rule %q for field %q", errs.InvalidSchema, ruleName, f.Path)
+			}
+			validator(f, &results)
+		}
 	}
 
 	return results, nil

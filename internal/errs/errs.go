@@ -17,7 +17,8 @@ var (
 	InvalidSchemaEmptyYAML  = fmt.Errorf("%w: yaml path must not be empty", InvalidSchema)
 	InvalidSchemaEmptyJSON  = fmt.Errorf("%w: json path must not be empty", InvalidSchema)
 	InvalidSchemaEmptyTOML  = fmt.Errorf("%w: toml path must not be empty", InvalidSchema)
-	ValidationRequired      = fmt.Errorf("%w: required", Validation)
+
+	ValidationRequired = fmt.Errorf("%w: required", Validation)
 
 	DecodeFieldCannotSet  = fmt.Errorf("%w: field cannot be set", Decode)
 	DecodeInvalidInt      = fmt.Errorf("%w: invalid int value", Decode)

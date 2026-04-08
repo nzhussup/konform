@@ -6,46 +6,12 @@ import (
 	"strings"
 
 	"github.com/nzhussup/konform/internal/errs"
+	schematypes "github.com/nzhussup/konform/internal/schema/types"
+	"github.com/nzhussup/konform/internal/validate/rules"
 )
 
-type Field struct {
-	GoName       string
-	Path         string
-	KeyName      string
-	EnvName      string
-	DefaultValue string
-	Validations  map[string]string
-	Type         reflect.Type
-	Value        reflect.Value
-}
-
-func (f Field) HasDefaultValue() bool {
-	return f.DefaultValue != ""
-}
-
-func (f Field) HasValidation(name string) bool {
-	if len(f.Validations) == 0 {
-		return false
-	}
-	_, ok := f.Validations[name]
-	return ok
-}
-
-func (f Field) ValidationArg(name string) (string, bool) {
-	if len(f.Validations) == 0 {
-		return "", false
-	}
-	v, ok := f.Validations[name]
-	return v, ok
-}
-
-type Schema struct {
-	Fields []Field
-}
-
-var supportedValidationRules = map[string]struct{}{
-	"required": {},
-}
+type Field = schematypes.Field
+type Schema = schematypes.Schema
 
 func Build(target any) (*Schema, error) {
 	v := reflect.ValueOf(target)
@@ -66,7 +32,7 @@ func Build(target any) (*Schema, error) {
 }
 
 func IsZeroValue(v reflect.Value) bool {
-	return v.IsZero()
+	return schematypes.IsZeroValue(v)
 }
 
 func parseValidateTag(path string, tag string) (map[string]string, error) {
@@ -74,7 +40,7 @@ func parseValidateTag(path string, tag string) (map[string]string, error) {
 		return nil, nil
 	}
 
-	rules := map[string]string{}
+	parsedRules := map[string]string{}
 	parts := strings.Split(tag, ",")
 	for _, part := range parts {
 		part = strings.TrimSpace(part)
@@ -86,20 +52,20 @@ func parseValidateTag(path string, tag string) (map[string]string, error) {
 		if k == "" {
 			continue
 		}
-		if _, ok := supportedValidationRules[k]; !ok {
+		if !rules.IsSupported(k) {
 			return nil, fmt.Errorf("%w: unsupported validate rule %q for field %q", errs.InvalidSchema, k, path)
 		}
 		if hasValue {
-			rules[k] = strings.TrimSpace(v)
+			parsedRules[k] = strings.TrimSpace(v)
 			continue
 		}
-		rules[k] = ""
+		parsedRules[k] = ""
 	}
 
-	if len(rules) == 0 {
+	if len(parsedRules) == 0 {
 		return nil, nil
 	}
-	return rules, nil
+	return parsedRules, nil
 }
 
 func collectFields(v reflect.Value, t reflect.Type, parentPath string, fields *[]Field) error {

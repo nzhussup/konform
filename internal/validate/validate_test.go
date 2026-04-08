@@ -7,6 +7,8 @@ import (
 
 	"github.com/nzhussup/konform/internal/errs"
 	"github.com/nzhussup/konform/internal/schema"
+	"github.com/nzhussup/konform/internal/validate/rules"
+	"github.com/nzhussup/konform/internal/validate/types"
 )
 
 func TestValidate(t *testing.T) {
@@ -89,6 +91,18 @@ func TestValidate(t *testing.T) {
 			wantCount:     1,
 			wantFieldPath: []string{"Port"},
 		},
+		{
+			name: "unsupported validate rule returns invalid schema error",
+			schemaBuilder: func() *schema.Schema {
+				return &schema.Schema{
+					Fields: []schema.Field{
+						makeIntField("Age", map[string]string{"min": "18"}, new(int)),
+					},
+				}
+			},
+			wantErrType: errs.InvalidSchema,
+			wantCount:   0,
+		},
 	}
 
 	for _, tt := range tests {
@@ -124,5 +138,65 @@ func TestValidate(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestValidateDispatchesOnlyDeclaredRules(t *testing.T) {
+	makeField := func(name string, validations map[string]string) schema.Field {
+		v := ""
+		return schema.Field{
+			GoName:      name,
+			Path:        name,
+			Validations: validations,
+			Type:        reflect.TypeOf(""),
+			Value:       reflect.ValueOf(&v).Elem(),
+		}
+	}
+
+	ruleA := "test_rule_a"
+	ruleB := "test_rule_b"
+
+	originalA, hadA := rules.Registry[ruleA]
+	originalB, hadB := rules.Registry[ruleB]
+	defer func() {
+		if hadA {
+			rules.Registry[ruleA] = originalA
+		} else {
+			delete(rules.Registry, ruleA)
+		}
+		if hadB {
+			rules.Registry[ruleB] = originalB
+		} else {
+			delete(rules.Registry, ruleB)
+		}
+	}()
+
+	calls := map[string]int{}
+	rules.Registry[ruleA] = func(_ schema.Field, _ *[]types.ValidationResult) {
+		calls[ruleA]++
+	}
+	rules.Registry[ruleB] = func(_ schema.Field, _ *[]types.ValidationResult) {
+		calls[ruleB]++
+	}
+
+	sc := &schema.Schema{
+		Fields: []schema.Field{
+			makeField("OnlyA", map[string]string{ruleA: ""}),
+			makeField("None", nil),
+		},
+	}
+
+	results, err := Validate(sc)
+	if err != nil {
+		t.Fatalf("Validate() error = %v, want nil", err)
+	}
+	if len(results) != 0 {
+		t.Fatalf("len(results) = %d, want 0", len(results))
+	}
+	if calls[ruleA] != 1 {
+		t.Fatalf("rule %q calls = %d, want 1", ruleA, calls[ruleA])
+	}
+	if calls[ruleB] != 0 {
+		t.Fatalf("rule %q calls = %d, want 0", ruleB, calls[ruleB])
 	}
 }

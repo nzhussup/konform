@@ -1,4 +1,4 @@
-package validators
+package validators_test
 
 import (
 	"errors"
@@ -7,7 +7,8 @@ import (
 
 	"github.com/nzhussup/konform/internal/errs"
 	"github.com/nzhussup/konform/internal/schema"
-	"github.com/nzhussup/konform/internal/validate/model"
+	"github.com/nzhussup/konform/internal/validate/types"
+	"github.com/nzhussup/konform/internal/validate/validators"
 )
 
 func TestRequired(t *testing.T) {
@@ -33,17 +34,18 @@ func TestRequired(t *testing.T) {
 	tests := []struct {
 		name        string
 		field       schema.Field
-		initial     []model.ValidationResult
+		initial     []types.ValidationResult
 		wantAdded   bool
 		wantTotal   int
 		wantErrType error
 	}{
 		{
-			name:      "optional field is ignored even when zero",
-			field:     makeStringField("Name", nil, new(string)),
-			initial:   nil,
-			wantAdded: false,
-			wantTotal: 0,
+			name:        "zero field adds required validation result even without rules",
+			field:       makeStringField("Name", nil, new(string)),
+			initial:     nil,
+			wantAdded:   true,
+			wantTotal:   1,
+			wantErrType: errs.ValidationRequired,
 		},
 		{
 			name: "required field with non-zero value has no validation error",
@@ -74,7 +76,7 @@ func TestRequired(t *testing.T) {
 		{
 			name:  "required failure appends after existing validations",
 			field: makeStringField("Name", map[string]string{"required": ""}, new(string)),
-			initial: []model.ValidationResult{
+			initial: []types.ValidationResult{
 				{Err: errors.New("existing")},
 			},
 			wantAdded:   true,
@@ -85,9 +87,9 @@ func TestRequired(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results := append([]model.ValidationResult(nil), tt.initial...)
+			results := append([]types.ValidationResult(nil), tt.initial...)
 
-			Required(tt.field, &results)
+			validators.Required(tt.field, &results)
 
 			if got := len(results); got != tt.wantTotal {
 				t.Fatalf("len(results) = %d, want %d", got, tt.wantTotal)
