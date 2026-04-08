@@ -4,7 +4,7 @@ import (
 	"github.com/nzhussup/konform/internal/errs"
 	"github.com/nzhussup/konform/internal/schema"
 	"github.com/nzhussup/konform/internal/validate/model"
-	"github.com/nzhussup/konform/internal/validate/validations"
+	"github.com/nzhussup/konform/internal/validate/validators"
 )
 
 func Validate(sc *schema.Schema) ([]model.ValidationResult, error) {
@@ -13,7 +13,7 @@ func Validate(sc *schema.Schema) ([]model.ValidationResult, error) {
 	}
 	var results []model.ValidationResult
 	for _, f := range sc.Fields {
-		validations.Required(f, &results)
+		validators.Required(f, &results)
 	}
 
 	return results, nil

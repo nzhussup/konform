@@ -1,4 +1,4 @@
-package validations
+package validators
 
 import (
 	"github.com/nzhussup/konform/internal/errs"
