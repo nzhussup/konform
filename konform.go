@@ -4,8 +4,6 @@ import (
 	internaldefaults "github.com/nzhussup/konform/internal/defaults"
 	internalschema "github.com/nzhussup/konform/internal/schema"
 	internalvalidate "github.com/nzhussup/konform/internal/validate"
-
-	"github.com/nzhussup/konform/internal/errs"
 )
 
 func Load(target any, opts ...Option) error {
@@ -32,16 +30,16 @@ func Load(target any, opts ...Option) error {
 		}
 	}
 
-	missing, err := internalvalidate.MissingRequired(sc)
+	validations, err := internalvalidate.Validate(sc)
 	if err != nil {
 		return err
 	}
-	if len(missing) > 0 {
-		fieldErrors := make([]FieldError, 0, len(missing))
-		for _, f := range missing {
+	if len(validations) > 0 {
+		fieldErrors := make([]FieldError, 0, len(validations))
+		for _, validation := range validations {
 			fieldErrors = append(fieldErrors, FieldError{
-				Path: f.Path,
-				Err:  errs.ValidationRequired,
+				Path: validation.Field.Path,
+				Err:  validation.Err,
 			})
 		}
 
