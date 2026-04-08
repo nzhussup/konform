@@ -62,4 +62,3 @@ func TestIsZeroValue(t *testing.T) {
 		t.Fatalf("IsZeroValue(1) = true, want false")
 	}
 }
-

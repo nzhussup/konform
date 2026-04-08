@@ -13,4 +13,3 @@ func TestUnknownKeySuggestionModeConstants(t *testing.T) {
 		t.Fatalf("suggestion modes must be distinct")
 	}
 }
-

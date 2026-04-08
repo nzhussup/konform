@@ -35,4 +35,3 @@ func TestValidationTypesShape(t *testing.T) {
 		t.Fatalf("result err = %v, want boom", results[0].Err)
 	}
 }
-

@@ -8,8 +8,8 @@ import (
 	internalschema "github.com/nzhussup/konform/internal/schema"
 	envsource "github.com/nzhussup/konform/internal/source/env"
 
-	jsonsource "github.com/nzhussup/konform/internal/source/json"
 	"github.com/nzhussup/konform/internal/source/common"
+	jsonsource "github.com/nzhussup/konform/internal/source/json"
 	tomlsource "github.com/nzhussup/konform/internal/source/toml"
 	yamlsource "github.com/nzhussup/konform/internal/source/yaml"
 )
@@ -19,8 +19,8 @@ type Option func(*loadOptions) error
 type sourceLoader func(*internalschema.Schema) error
 
 type loadOptions struct {
-	sources                []sourceLoader
-	unknownKeySuggestMode  common.UnknownKeySuggestionMode
+	sources               []sourceLoader
+	unknownKeySuggestMode common.UnknownKeySuggestionMode
 }
 
 type UnknownKeySuggestionMode = common.UnknownKeySuggestionMode

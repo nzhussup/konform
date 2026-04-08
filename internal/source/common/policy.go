@@ -6,4 +6,3 @@ const (
 	UnknownKeySuggestionError UnknownKeySuggestionMode = iota
 	UnknownKeySuggestionOff
 )
-
