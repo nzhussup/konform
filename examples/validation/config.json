@@ -8,5 +8,15 @@
         "Username": "user",
         "Password": "password",
         "Name": "example_db"
-    }
+    },
+    "Logging": {
+        "Level": "info",
+        "AllowedLevels": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+        ]
+    },
+    "NumberOfWorkers": 5
 }

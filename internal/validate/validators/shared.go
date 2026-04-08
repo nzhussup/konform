@@ -1,6 +1,9 @@
 package validators
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 func numericAsFloat64(v reflect.Value) (float64, bool) {
 	switch v.Kind() {
@@ -13,4 +16,12 @@ func numericAsFloat64(v reflect.Value) (float64, bool) {
 	default:
 		return 0, false
 	}
+}
+
+func parsePipeSeparated(s string) []string {
+	var result []string
+	for _, part := range strings.Split(s, "|") {
+		result = append(result, strings.TrimSpace(part))
+	}
+	return result
 }

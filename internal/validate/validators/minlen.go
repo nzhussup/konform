@@ -9,7 +9,7 @@ import (
 	"github.com/nzhussup/konform/internal/validate/types"
 )
 
-const MinLenRuleName = "min_len"
+const MinLenRuleName = "minlen"
 
 func MinLen(f schematypes.Field, validations *[]types.ValidationResult) {
 	minLenArg, ok := f.ValidationArg(MinLenRuleName)

@@ -33,37 +33,37 @@ func TestMaxLen(t *testing.T) {
 		wantLike    string
 	}{
 		{
-			name:      "missing max_len rule is ignored",
+			name:      "missing maxlen rule is ignored",
 			field:     makeStringField("Name", "abc", nil),
 			wantTotal: 0,
 		},
 		{
-			name:      "length equal to max_len passes",
-			field:     makeStringField("Name", "abc", map[string]string{"max_len": "3"}),
+			name:      "length equal to maxlen passes",
+			field:     makeStringField("Name", "abc", map[string]string{"maxlen": "3"}),
 			wantTotal: 0,
 		},
 		{
-			name:      "length smaller than max_len passes",
-			field:     makeStringField("Name", "ab", map[string]string{"max_len": "3"}),
+			name:      "length smaller than maxlen passes",
+			field:     makeStringField("Name", "ab", map[string]string{"maxlen": "3"}),
 			wantTotal: 0,
 		},
 		{
-			name:        "length larger than max_len returns validation max len",
-			field:       makeStringField("Name", "abcd", map[string]string{"max_len": "3"}),
+			name:        "length larger than maxlen returns validation max len",
+			field:       makeStringField("Name", "abcd", map[string]string{"maxlen": "3"}),
 			wantTotal:   1,
 			wantErrType: errs.ValidationMaxLen,
 			wantLike:    "expected maximum length 3 but got 4",
 		},
 		{
-			name:        "invalid max_len arg returns invalid schema",
-			field:       makeStringField("Name", "abc", map[string]string{"max_len": "abc"}),
+			name:        "invalid maxlen arg returns invalid schema",
+			field:       makeStringField("Name", "abc", map[string]string{"maxlen": "abc"}),
 			wantTotal:   1,
 			wantErrType: errs.InvalidSchema,
-			wantLike:    `invalid max_len value "abc"`,
+			wantLike:    `invalid maxlen value "abc"`,
 		},
 		{
 			name:  "appends after existing validations",
-			field: makeStringField("Name", "abcd", map[string]string{"max_len": "3"}),
+			field: makeStringField("Name", "abcd", map[string]string{"maxlen": "3"}),
 			initial: []types.ValidationResult{
 				{Err: errors.New("existing")},
 			},

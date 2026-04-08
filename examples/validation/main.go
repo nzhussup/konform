@@ -10,18 +10,22 @@ import (
 type Config struct {
 	AppName     string `validate:"required,min=3,max=100"`
 	Version     string `validate:"required"`
-	Description string `validate:"required,max_len=10"`
+	Description string `validate:"required,maxlen=10"`
 	Database    struct {
 		Host     string `validate:"required"`
 		Port     int    `validate:"required,min=1,max=65535,len=5"`
-		Username string `validate:"required, min_len=3, max_len=50"`
-		Password string `validate:"required,min_len=15"`
-		Name     string `validate:"required"`
+		Username string `validate:"required,minlen=3,maxlen=50"`
+		Password string `validate:"required,minlen=15"`
+		Name     string `validate:"required,regex=^db"`
 	}
 	Features struct {
 		EnableLogging bool
 		EnableMetrics bool
 	} `validate:"required"`
+	Logging struct {
+		Level string `validate:"required,oneof=debug|warn|error"`
+	} `validate:"required"`
+	NumberOfWorkers int `validate:"oneof=1|2|4|8"`
 }
 
 func main() {

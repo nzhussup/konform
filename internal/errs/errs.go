@@ -25,7 +25,8 @@ var (
 	ValidationLen        = fmt.Errorf("%w: length mismatch", Validation)
 	ValidationMinLen     = fmt.Errorf("%w: minimum length not met", Validation)
 	ValidationMaxLen     = fmt.Errorf("%w: maximum length exceeded", Validation)
-	ValidationPattern    = fmt.Errorf("%w: pattern mismatch", Validation)
+	ValidationRegex      = fmt.Errorf("%w: regex mismatch", Validation)
+	ValidationOneOf      = fmt.Errorf("%w: none of the allowed values matched", Validation)
 
 	DecodeFieldCannotSet  = fmt.Errorf("%w: field cannot be set", Decode)
 	DecodeInvalidInt      = fmt.Errorf("%w: invalid int value", Decode)

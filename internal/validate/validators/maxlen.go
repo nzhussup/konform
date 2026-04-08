@@ -9,7 +9,7 @@ import (
 	"github.com/nzhussup/konform/internal/validate/types"
 )
 
-const MaxLenRuleName = "max_len"
+const MaxLenRuleName = "maxlen"
 
 func MaxLen(f schematypes.Field, validations *[]types.ValidationResult) {
 	maxLenArg, ok := f.ValidationArg(MaxLenRuleName)
