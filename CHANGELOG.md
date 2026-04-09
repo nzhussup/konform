@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.1 - 2026-04-08
+
+
+
+### Documentation
+
+- Update changelog for v0.3.0 [skip ci]
+
+- Add documentation
+
+
+### Features
+
+- Add strict mode
+
+- Add reporting feature
+
+
+### Fixes
+
+- Skip codeql on release workflow [skip ci] [skip codeql]
+
+
 ## v0.3.0 - 2026-04-08
 
 
